@@ -5,6 +5,7 @@
 import json
 import dateutil.parser
 import babel
+import os
 from datetime import datetime
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
@@ -75,7 +76,7 @@ class Show(db.Model):
 #----------------------------------------------------------------------------#
 
 def format_datetime(value, format='medium'):
-  date = dateutil.parser.parse(value)
+  date = dateutil.parser.parse(str(value))
   if format == 'full':
       format="EEEE MMMM, d, y 'at' h:mma"
   elif format == 'medium':
@@ -137,7 +138,9 @@ def search_venues():
     for venue in venue_query:
       venue_joined = db.session.query(Show).join(Venue, Venue.id == Show.venue_id).filter(Venue.id == venue.id).all()
       for musician in venue_joined:
-        if format_datetime(str(musician.start_time)) > format_datetime(str(datetime.now())):
+        show_time = musician.start_time.strftime("%d-%b-%Y %H:%M:%S")
+        today_time = datetime.today().strftime("%d-%b-%Y %H:%M:%S")
+        if show_time > today_time:
           num_upcoming_shows +=1
       data.append({"id":venue.id,"name": venue.name, "num_upcoming_shows":num_upcoming_shows})
     response = {"count":len(venue_query),"data":data} 
@@ -162,7 +165,10 @@ def show_venue(venue_id):
     artist_in_show = {'artist_id':show.artist_id,'start_time':show.start_time}
     artist_data = db.session.query(Artist).join(Show,Show.artist_id == Artist.id).filter(Artist.id == artist_in_show['artist_id']).all()
     for artist in artist_data:
-      if format_datetime(str(artist_in_show['start_time']))< format_datetime(str(datetime.today())):
+      show_time = artist_in_show['start_time'].strftime("%d-%b-%Y %H:%M:%S")
+      today_time = datetime.today().strftime("%d-%b-%Y %H:%M:%S")
+      
+      if show_time < today_time:
         past = {'artist_id':artist.id,'name':artist.name,'artist_image_link':artist.image_link,
         'start_time': show.start_time}
         past_shows.append(past)
@@ -244,8 +250,9 @@ def search_artists():
     for artist in artist_query:
       artist_joined = db.session.query(Show).join(Artist, Artist.id == Show.artist_id).filter(Artist.id == artist.id).all()
       for musician in artist_joined:
-        print(musician)
-        if format_datetime(str(musician.start_time)) > format_datetime(str(datetime.now())):
+        show_time = musician.start_time.strftime("%d-%b-%Y %H:%M:%S")
+        today_time = datetime.today().strftime("%d-%b-%Y %H:%M:%S")
+        if show_time > today_time:
           num_upcoming_shows +=1
       data.append({"id":artist.id,"name": artist.name, "num_upcoming_shows":num_upcoming_shows})
     response = {"count":len(artist_query),"data":data}  
@@ -271,7 +278,9 @@ def show_artist(artist_id):
     venue_data = db.session.query(Venue).join(Show,Show.venue_id == Venue.id).filter(Venue.id == venue_in_show['venue_id']).all()
     
     for venue in venue_data:
-      if format_datetime(str(venue_in_show['start_time']))< format_datetime(str(datetime.today())):
+      show_time = venue_in_show['start_time'].strftime("%d-%b-%Y %H:%M:%S")
+      today_time = datetime.today().strftime("%d-%b-%Y %H:%M:%S")
+      if show_time< today_time:
         past = {'venue_id':venue.id,'name':venue.name,'venue_image_link':venue.image_link,
         'start_time': show.start_time}
         past_shows.append(past)
@@ -406,7 +415,7 @@ def shows():
           "artist_id": show.artist_id,
           "artist_name": Artist.query.filter_by(id=show.artist_id).first().name,
           "artist_image_link": Artist.query.filter_by(id=show.artist_id).first().image_link,
-          "start_time": format_datetime(str(show.start_time))
+          "start_time": show.start_time.strftime("%d-%b-%Y %H:%M:%S")
       })
   return render_template('pages/shows.html', shows=data)
 
@@ -453,17 +462,18 @@ if not app.debug:
     app.logger.addHandler(file_handler)
     app.logger.info('errors')
 
+
 #----------------------------------------------------------------------------#
 # Launch.
 #----------------------------------------------------------------------------#
 
 # Default port:
-if __name__ == '__main__':
-    app.run()
+""" if __name__ == '__main__':
+    app.run() """
 
 # Or specify port manually:
-'''
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-'''
+
