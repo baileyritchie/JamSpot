@@ -7,22 +7,20 @@ JamSpot is a musical venue and artist booking site that facilitates the discover
 
 ### Tech Stack
 
-* **SQLAlchemy ORM** to be our ORM library of choice
-* **PostgreSQL** as our database of choice
-* **Python3** and **Flask** as our server language and server framework
-* **Flask-Migrate** for creating and running schema migrations
-* **HTML**, **CSS**, and **Javascript** with [Bootstrap 3](https://getbootstrap.com/docs/3.4/customize/) for our website's frontend
+* **SQLAlchemy ORM** 
+* **PostgreSQL**
+* **Python3** and **Flask** 
+* **Flask-Migrate** 
+* **HTML**, **CSS**, and **Javascript** with [Bootstrap 3](https://getbootstrap.com/docs/3.4/customize/) 
 
 ### Main Files: Project Structure
 
   ```sh
   ├── README.md
-  ├── app.py *** the main driver of the app. Includes your SQLAlchemy models.
-                    "python app.py" to run after installing dependences
-  ├── config.py *** Database URLs, CSRF generation, etc
+  ├── app.py 
+  ├── config.py 
   ├── error.log
-  ├── forms.py *** Your forms
-  ├── requirements.txt *** The dependencies we need to install with "pip3 install -r requirements.txt"
+  ├── forms.py 
   ├── static
   │   ├── css 
   │   ├── font
